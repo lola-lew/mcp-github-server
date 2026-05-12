@@ -3,7 +3,9 @@
     "allow": [
       "Bash(python -c \"import ast; ast.parse\\(open\\('server.py'\\).read\\(\\)\\); print\\('ok'\\)\")",
       "Bash(git add *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(python -c \"import ast; ast.parse\\(open\\('server.py'\\).read\\(\\)\\); print\\('sintaxis OK'\\)\")",
+      "Bash(python -c \"import aiosqlite; import multipart; from starlette.middleware.base import BaseHTTPMiddleware; from starlette.responses import HTMLResponse, RedirectResponse; print\\('imports OK'\\)\")"
     ]
   }
 }
