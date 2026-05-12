@@ -124,7 +124,7 @@ mcp_asgi = mcp.streamable_http_app()
 
 @asynccontextmanager
 async def lifespan(app):
-    async with mcp.lifespan_context(app):
+    async with mcp.session_manager.run():
         yield
 
 
