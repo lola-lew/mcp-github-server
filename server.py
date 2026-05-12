@@ -118,7 +118,7 @@ async def list_branches(owner: str, repo: str) -> str:
 
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        if request.url.path == "/health":
+        if request.url.path == "/health" or request.url.path.startswith("/mcp"):
             return await call_next(request)
         auth = request.headers.get("Authorization", "")
         if not auth.startswith("Bearer ") or auth.removeprefix("Bearer ") != MCP_AUTH_TOKEN:
