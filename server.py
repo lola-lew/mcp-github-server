@@ -132,7 +132,7 @@ app = Starlette(
     lifespan=lifespan,
     routes=[
         Route("/health", health),
-        Mount("/mcp", app=mcp_asgi),
+        Mount("/", app=mcp_asgi),
     ],
 )
 
