@@ -119,26 +119,6 @@ async def health(request: Request) -> JSONResponse:
     return JSONResponse({"status": "ok"})
 
 
-async def oauth_protected_resource(request: Request) -> JSONResponse:
-    return JSONResponse({
-        "resource": str(request.base_url),
-        "authorization_servers": [],
-        "bearer_methods_supported": ["header"],
-    })
-
-
-async def oauth_authorization_server(request: Request) -> JSONResponse:
-    return JSONResponse({
-        "issuer": str(request.base_url),
-        "response_types_supported": [],
-        "grant_types_supported": [],
-    })
-
-
-async def register(request: Request) -> JSONResponse:
-    return JSONResponse({}, status_code=200)
-
-
 mcp_asgi = mcp.streamable_http_app()
 
 
@@ -151,10 +131,6 @@ app = Starlette(
     lifespan=lifespan,
     routes=[
         Route("/health", health),
-        Route("/.well-known/oauth-protected-resource", oauth_protected_resource),
-        Route("/.well-known/oauth-protected-resource/mcp", oauth_protected_resource),
-        Route("/.well-known/oauth-authorization-server", oauth_authorization_server),
-        Route("/register", register, methods=["POST"]),
         Mount("/", app=mcp_asgi),
     ],
 )
