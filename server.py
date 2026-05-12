@@ -16,6 +16,10 @@ from starlette.requests import Request
 from starlette.responses import HTMLResponse, JSONResponse, RedirectResponse
 from starlette.routing import Mount, Route
 import uvicorn
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -80,6 +84,14 @@ async def validate_token(token: str) -> bool:
         ) as cursor:
             row = await cursor.fetchone()
     return row is not None and row[0] >= time.time()
+
+
+async def log_requests(request: Request, call_next):
+    body = await request.body()
+    logger.info(f">>> {request.method} {request.url.path}")
+    logger.info(f"    headers: {dict(request.headers)}")
+    logger.info(f"    body: {body.decode('utf-8', errors='replace')}")
+    return await call_next(request)
 
 
 async def mcp_auth_dispatch(request: Request, call_next):
@@ -366,6 +378,7 @@ app = Starlette(
         Mount("/", app=mcp_asgi),
     ],
 )
+app.add_middleware(BaseHTTPMiddleware, dispatch=log_requests)
 app.add_middleware(BaseHTTPMiddleware, dispatch=mcp_auth_dispatch)
 
 if __name__ == "__main__":
