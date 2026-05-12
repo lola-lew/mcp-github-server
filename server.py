@@ -15,7 +15,7 @@ load_dotenv()
 GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
 PORT = int(os.getenv("PORT", "8000"))
 
-mcp = FastMCP("github-server", host="0.0.0.0")
+mcp = FastMCP("github-server", host="0.0.0.0", stateless_http=True, json_response=True)
 
 GITHUB_HEADERS = {
     "Authorization": f"Bearer {GITHUB_TOKEN}",
@@ -144,8 +144,7 @@ mcp_asgi = mcp.streamable_http_app()
 
 @asynccontextmanager
 async def lifespan(app):
-    async with mcp.session_manager.run():
-        yield
+    yield
 
 
 app = Starlette(
