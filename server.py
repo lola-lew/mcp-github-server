@@ -1,19 +1,18 @@
 import os
 import base64
+from contextlib import asynccontextmanager
 import httpx
 from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
 from starlette.applications import Starlette
-from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.requests import Request
 from starlette.responses import JSONResponse
+from starlette.requests import Request
 from starlette.routing import Mount, Route
 import uvicorn
 
 load_dotenv()
 
 GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
-MCP_AUTH_TOKEN = os.environ["MCP_AUTH_TOKEN"]
 PORT = int(os.getenv("PORT", "8000"))
 
 mcp = FastMCP("github-server")
@@ -116,29 +115,26 @@ async def list_branches(owner: str, repo: str) -> str:
     return "\n".join(b["name"] for b in data)
 
 
-class AuthMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        if request.url.path == "/health" or request.url.path.startswith("/mcp"):
-            return await call_next(request)
-        auth = request.headers.get("Authorization", "")
-        if not auth.startswith("Bearer ") or auth.removeprefix("Bearer ") != MCP_AUTH_TOKEN:
-            return JSONResponse({"error": "Unauthorized"}, status_code=401)
-        return await call_next(request)
-
-
 async def health(request: Request) -> JSONResponse:
     return JSONResponse({"status": "ok"})
 
 
 mcp_asgi = mcp.streamable_http_app()
 
+
+@asynccontextmanager
+async def lifespan(app):
+    async with mcp.lifespan_context(app):
+        yield
+
+
 app = Starlette(
+    lifespan=lifespan,
     routes=[
         Route("/health", health),
-        Mount("/", app=mcp_asgi),
+        Mount("/mcp", app=mcp_asgi),
     ],
 )
-app.add_middleware(AuthMiddleware)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=PORT)
