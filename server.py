@@ -366,7 +366,8 @@ mcp_asgi = mcp.streamable_http_app()
 @asynccontextmanager
 async def lifespan(app):
     await init_db()
-    yield
+    async with mcp_asgi.router.lifespan_context(mcp_asgi):
+        yield
 
 
 app = Starlette(

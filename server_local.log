@@ -1,0 +1,15 @@
+INFO:     Started server process [5656]
+INFO:     Waiting for application startup.
+INFO:mcp.server.streamable_http_manager:StreamableHTTP session manager started
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:__main__:>>> POST /mcp
+INFO:__main__:    headers: {'host': 'localhost:8000', 'user-agent': 'curl/8.18.0', 'accept': '*/*', 'authorization': 'Bearer test_fake_token_bypass', 'content-type': 'application/json', 'content-length': '153'}
+INFO:__main__:    body: {"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"test","version":"1.0.0"}},"jsonrpc":"2.0","id":0}
+INFO:     127.0.0.1:56609 - "POST /mcp HTTP/1.1" 406 Not Acceptable
+INFO:mcp.server.streamable_http:Terminating session: None
+INFO:__main__:>>> POST /mcp
+INFO:__main__:    headers: {'host': 'localhost:8000', 'user-agent': 'curl/8.18.0', 'authorization': 'Bearer test_fake_token_bypass', 'content-type': 'application/json', 'accept': 'application/json', 'content-length': '153'}
+INFO:__main__:    body: {"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"test","version":"1.0.0"}},"jsonrpc":"2.0","id":0}
+INFO:     127.0.0.1:56611 - "POST /mcp HTTP/1.1" 200 OK
+INFO:mcp.server.streamable_http:Terminating session: None
