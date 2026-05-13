@@ -101,14 +101,14 @@ async def mcp_auth_dispatch(request: Request, call_next):
             return JSONResponse(
                 {"error": "unauthorized"},
                 status_code=401,
-                headers={"WWW-Authenticate": 'Bearer error="invalid_token"'},
+                headers={"WWW-Authenticate": 'Bearer resource_metadata="https://mcp-github-server-production.up.railway.app/.well-known/oauth-protected-resource", scope="mcp"'},
             )
         token = auth.removeprefix("Bearer ")
         if not await validate_token(token):
             return JSONResponse(
                 {"error": "unauthorized"},
                 status_code=401,
-                headers={"WWW-Authenticate": 'Bearer error="invalid_token"'},
+                headers={"WWW-Authenticate": 'Bearer resource_metadata="https://mcp-github-server-production.up.railway.app/.well-known/oauth-protected-resource", scope="mcp"'},
             )
     return await call_next(request)
 
@@ -229,6 +229,10 @@ async def oauth_authorization_server(request: Request) -> JSONResponse:
         "code_challenge_methods_supported": ["S256"],
         "scopes_supported": ["mcp"],
     })
+
+
+async def register_get(request: Request) -> JSONResponse:
+    return JSONResponse({})
 
 
 async def register(request: Request) -> JSONResponse:
@@ -369,8 +373,10 @@ app = Starlette(
     lifespan=lifespan,
     routes=[
         Route("/health", health),
+        Route("/.well-known/oauth-protected-resource/mcp", oauth_protected_resource),
         Route("/.well-known/oauth-protected-resource", oauth_protected_resource),
         Route("/.well-known/oauth-authorization-server", oauth_authorization_server),
+        Route("/register", register_get, methods=["GET"]),
         Route("/register", register, methods=["POST"]),
         Route("/authorize", authorize_get, methods=["GET"]),
         Route("/authorize", authorize_post, methods=["POST"]),
