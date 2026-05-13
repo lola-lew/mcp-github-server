@@ -217,7 +217,7 @@ async def oauth_protected_resource(request: Request) -> JSONResponse:
 
 
 async def oauth_authorization_server(request: Request) -> JSONResponse:
-    base = public_base_url(request)
+    base = public_base_url(request).replace("http://", "https://")
     return JSONResponse({
         "issuer": base,
         "authorization_endpoint": f"{base}/authorize",
