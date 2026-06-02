@@ -25,6 +25,7 @@ load_dotenv()
 
 GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
 OWNER_PASSPHRASE = os.environ["OWNER_PASSPHRASE"]
+BASE_URL = os.getenv("BASE_URL", "")
 DB_PATH = os.getenv("DB_PATH", "oauth.db")
 PORT = int(os.getenv("PORT", "8000"))
 
@@ -101,14 +102,14 @@ async def mcp_auth_dispatch(request: Request, call_next):
             return JSONResponse(
                 {"error": "unauthorized"},
                 status_code=401,
-                headers={"WWW-Authenticate": 'Bearer resource_metadata="https://mcp-github-server-production.up.railway.app/.well-known/oauth-protected-resource", scope="mcp"'},
+                headers={"WWW-Authenticate": f'Bearer resource_metadata="{BASE_URL}/.well-known/oauth-protected-resource", scope="mcp"'},
             )
         token = auth.removeprefix("Bearer ")
         if not await validate_token(token):
             return JSONResponse(
                 {"error": "unauthorized"},
                 status_code=401,
-                headers={"WWW-Authenticate": 'Bearer resource_metadata="https://mcp-github-server-production.up.railway.app/.well-known/oauth-protected-resource", scope="mcp"'},
+                headers={"WWW-Authenticate": f'Bearer resource_metadata="{BASE_URL}/.well-known/oauth-protected-resource", scope="mcp"'},
             )
     return await call_next(request)
 
