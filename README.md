@@ -1,4 +1,4 @@
-# mcp-github-server
+# mcp-github-reader
 
 ![Python](https://img.shields.io/badge/python-3.11+-3776ab)
 ![MCP](https://img.shields.io/badge/MCP-StreamableHTTP-6e40c9)
@@ -7,7 +7,11 @@
 
 A minimal MCP server that gives Claude read access to your GitHub repositories — directly from claude.ai conversations.
 
-Claude's web interface has no native access to GitHub repositories. This server bridges that gap: connect it to claude.ai as a custom connector and Claude can read any repository included in your GitHub token — public or private — directly from the conversation.
+## Why this exists
+
+claude.ai has no native way to read your code. You end up copy-pasting files into the conversation, losing context, and working around a limitation that shouldn't exist.
+
+This server removes that friction. Deploy it once, connect it as a custom connector, and Claude can read any repository in your GitHub token — public or private — directly from the conversation.
 
 > **Intended for use with claude.ai (web/desktop).** Claude Code and Cowork already have filesystem access and don't need this.
 
@@ -18,18 +22,14 @@ sequenceDiagram
     participant C as claude.ai
     participant S as MCP Server
     participant U as You (browser)
-
     C->>S: POST /register
     S-->>C: client_id + client_secret
-
     C->>S: GET /authorize?client_id=...&code_challenge=...
     S-->>U: Authorization page (passphrase form)
     U->>S: POST /authorize (passphrase)
     S-->>C: 302 redirect with auth code
-
     C->>S: POST /token (code + code_verifier)
     S-->>C: access_token
-
     C->>S: POST /mcp (Bearer token)
     S-->>C: MCP tools response
 ```
@@ -46,6 +46,23 @@ sequenceDiagram
 | `search_code` | Search for code across a repository |
 
 > **Note:** `search_code` relies on GitHub's search index, which may not be built for small private repos. For those cases, use `get_file` directly instead.
+
+## Usage
+
+Once connected, just talk to Claude naturally:
+
+```
+"List all files in the src folder of my-repo"
+→ Claude calls list_contents(repo="my-repo", path="src")
+
+"Show me the contents of src/main.py"
+→ Claude calls get_file(repo="my-repo", path="src/main.py")
+
+"What changed in the last 5 commits on the main branch?"
+→ Claude calls list_commits(repo="my-repo", branch="main")
+```
+
+Claude handles tool selection automatically based on your request.
 
 ## Prerequisites
 
@@ -68,8 +85,8 @@ sequenceDiagram
 1. Fork this repo
 2. Create a new project in Railway and connect your fork
 3. Set the environment variables above in Railway's variable settings
-4. Railway will detect `railway.toml` and deploy automatically
-5. Copy your Railway deployment URL and set it as `BASE_URL`
+4. Deploy — Railway will detect `railway.toml` and build automatically
+5. Once deployed, copy your Railway URL and set it as `BASE_URL` in the same variable settings
 
 ## Connect to claude.ai
 
