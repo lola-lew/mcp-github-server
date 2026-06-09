@@ -96,6 +96,8 @@ Claude handles tool selection automatically based on your request.
 4. Enter your `OWNER_PASSPHRASE` and authorize
 5. Done — Claude can now read your repositories
 
+> The server is read-only by design. It cannot create, modify, or delete anything in your repositories.
+
 ## Stack
 
 - [MCP Python SDK](https://github.com/modelcontextprotocol/python-sdk) (FastMCP + StreamableHTTP)
