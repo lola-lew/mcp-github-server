@@ -132,19 +132,19 @@ async def github_get(path: str, params: dict = None) -> dict | list:
 
 
 @mcp.tool()
-async def list_contents(owner: str, repo: str, path: str = "/") -> str:
+async def list_contents(owner: str, repo: str, path: str = "/", ref: str = None) -> str:
     """List files and folders at a path in a GitHub repository."""
     clean_path = path.strip("/")
-    data = await github_get(f"/repos/{owner}/{repo}/contents/{clean_path}")
+    data = await github_get(f"/repos/{owner}/{repo}/contents/{clean_path}", params={"ref": ref} if ref else None)
     if isinstance(data, list):
         return "\n".join(f"{item['type']}: {item['name']}" for item in data)
     return f"{data['type']}: {data['name']}"
 
 
 @mcp.tool()
-async def get_file(owner: str, repo: str, path: str) -> str:
+async def get_file(owner: str, repo: str, path: str, ref: str = None) -> str:
     """Get the decoded content of a file in a GitHub repository."""
-    data = await github_get(f"/repos/{owner}/{repo}/contents/{path.lstrip('/')}")
+    data = await github_get(f"/repos/{owner}/{repo}/contents/{path.lstrip('/')}", params={"ref": ref} if ref else None)
     if data.get("encoding") == "base64":
         return base64.b64decode(data["content"]).decode("utf-8")
     return data.get("content", "")
@@ -528,14 +528,14 @@ async def token(request: Request) -> JSONResponse:
         await db.execute("DELETE FROM auth_codes WHERE code = ?", (code,))
         await db.execute(
             "INSERT INTO access_tokens (token, client_id, expires_at) VALUES (?, ?, ?)",
-            (access_token, client_id, int(time.time()) + 28800),
+            (access_token, client_id, int(time.time()) + 2592000),
         )
         await db.commit()
 
     return JSONResponse({
         "access_token": access_token,
         "token_type": "Bearer",
-        "expires_in": 28800,
+        "expires_in": 2592000,
         "scope": "mcp",
     })
 
