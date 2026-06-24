@@ -38,8 +38,8 @@ sequenceDiagram
 
 | Tool | Description |
 |------|-------------|
-| `list_contents` | List files and folders at a path in a repository |
-| `get_file` | Read the decoded content of any file |
+| `list_contents` | List files and folders at a path in a repository (supports `ref` to specify a branch) |
+| `get_file` | Read the decoded content of any file (supports `ref` to specify a branch) |
 | `list_branches` | List all branches in a repository |
 | `list_commits` | List recent commits on a branch |
 | `get_commit` | Get details of a specific commit |
@@ -57,6 +57,9 @@ Once connected, just talk to Claude naturally:
 
 "Show me the contents of src/main.py"
 → Claude calls get_file(repo="my-repo", path="src/main.py")
+
+"Read a file from a specific branch"
+→ Claude calls get_file(repo="my-repo", path="src/main.py", ref="dev")
 
 "What changed in the last 5 commits on the main branch?"
 → Claude calls list_commits(repo="my-repo", branch="main")
