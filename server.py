@@ -528,14 +528,14 @@ async def token(request: Request) -> JSONResponse:
         await db.execute("DELETE FROM auth_codes WHERE code = ?", (code,))
         await db.execute(
             "INSERT INTO access_tokens (token, client_id, expires_at) VALUES (?, ?, ?)",
-            (access_token, client_id, int(time.time()) + 28800),
+            (access_token, client_id, int(time.time()) + 604800),
         )
         await db.commit()
 
     return JSONResponse({
         "access_token": access_token,
         "token_type": "Bearer",
-        "expires_in": 28800,
+        "expires_in": 604800,
         "scope": "mcp",
     })
 
